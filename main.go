@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/julienschmidt/httprouter"
 )
 
 var (
@@ -24,49 +26,18 @@ func init() {
 func main() {
 	flag.Parse()
 
-	log.Printf("Serving on localhost:%d", port)
+	router := httprouter.New()
 
-	http.HandleFunc("/posts", func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-		idStr := r.URL.Path[len("/posts/"):]
+	router.GET("/", index)
+	router.GET("/posts", list)
+	router.POST("/posts", create)
+	router.GET("/posts/:id", fetch)
+	router.PUT("/posts/:id", update)
+	router.DELETE("/posts/:id", del)
 
-		if idStr != "" {
-			id, err := strconv.Atoi(idStr)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-
-			switch r.Method {
-			case "GET":
-				post, err := db.FindOne(id)
-				if err != nil {
-					http.Error(w, err.Error(), http.StatusNotFound)
-				} else {
-					serveJSON(w, post, http.StatusOK)
-				}
-			case "PUT":
-			case "DELETE":
-				db.Delete(id)
-				w.WriteHeader(http.StatusNoContent)
-			}
-			return
-		}
-
-		switch r.Method {
-		case "GET":
-			serveJSON(w, db.FindAll(), http.StatusOK)
-		case "POST":
-		}
-
-	})
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		logRequest(r)
-		fmt.Fprintln(w, "Welcome to the Posts test API!")
-	})
-
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("localhost:%d", port), nil))
+	addr := fmt.Sprintf("localhost:%d", port)
+	log.Printf("Serving on %s", addr)
+	log.Fatal(http.ListenAndServe(addr, router))
 }
 
 func logRequest(r *http.Request) {
@@ -83,4 +54,70 @@ func serveJSON(w http.ResponseWriter, data interface{}, status int) {
 		return
 	}
 	w.WriteHeader(status)
+}
+
+func idFromParams(ps httprouter.Params) (int, error) {
+	idStr := ps.ByName("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
+}
+
+func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	logRequest(r)
+	fmt.Fprintln(w, "Welcome to the Posts test API!")
+}
+
+func list(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+	serveJSON(w, db.FindAll(), http.StatusOK)
+}
+
+func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+}
+
+func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+	var id int
+	var err error
+	if id, err = idFromParams(ps); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	post, err := db.FindOne(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
+	} else {
+		serveJSON(w, post, http.StatusOK)
+	}
+}
+
+func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+
+	var id int
+	var err error
+	if id, err = idFromParams(ps); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	_ = id
+}
+
+func del(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	logRequest(r)
+	var id int
+	var err error
+	if id, err = idFromParams(ps); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	db.Delete(id)
+	w.WriteHeader(http.StatusNoContent)
 }
