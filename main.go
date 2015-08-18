@@ -53,7 +53,6 @@ func serveJSON(w http.ResponseWriter, data interface{}, status int) {
 		http.Error(w, http.StatusText(s), s)
 		return
 	}
-	w.WriteHeader(status)
 }
 
 func idFromParams(ps httprouter.Params) (int, error) {
@@ -77,6 +76,16 @@ func list(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	logRequest(r)
+
+	post := Post{}
+	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	post = db.Insert(post)
+
+	serveJSON(w, post, http.StatusOK)
 }
 
 func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -106,7 +115,18 @@ func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	_ = id
+	post := Post{}
+	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if post.ID == 0 {
+		post.ID = id
+	}
+
+	db.Update(post)
+	serveJSON(w, post, http.StatusOK)
 }
 
 func del(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
