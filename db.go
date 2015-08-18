@@ -76,3 +76,16 @@ func (db *DB) Update(p Post) {
 		}
 	}
 }
+
+// Delete removes a Post from the collection by ID
+func (db *DB) Delete(id int) {
+	db.Lock()
+	defer db.Unlock()
+
+	for i, post := range db.posts {
+		if post.ID == id {
+			db.posts = append(db.posts[:i], db.posts[i+1:]...)
+			return
+		}
+	}
+}
