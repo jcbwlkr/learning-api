@@ -34,9 +34,24 @@ func main() {
 	router.GET("/posts/:id", fetch)
 	router.PUT("/posts/:id", update)
 	router.DELETE("/posts/:id", del)
+	router.ServeFiles("/site/*filepath", http.Dir(""))
 
 	addr := fmt.Sprintf("localhost:%d", port)
-	log.Printf("Serving on %s", addr)
+
+	fmt.Printf("\nBlog posts test API!\n\n")
+
+	fmt.Printf("This server is now listening on %s\n", addr)
+	fmt.Printf("If you ran this command from inside your site's folder you can view your site at http://%s/site/\n", addr)
+
+	fmt.Println("You can make the following API requests")
+	fmt.Printf("GET    http://%s/posts      -- Get all posts\n", addr)
+	fmt.Printf("POST   http://%s/posts      -- Make a post. Send a body like {\"user\": \"alice\", \"message\": \"foo\"}\n", addr)
+	fmt.Printf("GET    http://%s/posts/:id  -- Get a particular post\n", addr)
+	fmt.Printf("PUT    http://%s/posts/:id  -- Update a post. Send a body like {\"user\": \"anna\", \"message\": \"bar\"}\n", addr)
+	fmt.Printf("DELETE http://%s/posts/:id  -- Delete a post\n", addr)
+
+	fmt.Printf("\nPress Ctrl-c at any time to kill this server\n\n")
+
 	log.Fatal(http.ListenAndServe(addr, router))
 }
 
