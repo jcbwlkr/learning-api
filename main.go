@@ -130,14 +130,15 @@ func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	article := Article{}
-	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+	article, err := db.FindOne(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	if article.ID == 0 {
-		article.ID = id
+	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
 	db.Update(article)

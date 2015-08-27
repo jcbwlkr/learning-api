@@ -56,7 +56,8 @@ Update an article. Replace `:id` with the id of the article you want to update.
 
 * Response Body: The updated article like `{"id": 1, "user": "JANE", "body": "Howdy"}`
 * Response Status: `200 OK` on success, `403 Bad Request` if id is not an
-  integer or if the provided JSON is invalid.
+  integer or if the provided JSON is invalid, `404 Not Found` if the article
+  does not already not exist.
 
 ## DELETE /articles/:id
 Delete an article. Replace `:id` with the id of the article you want to delete.
