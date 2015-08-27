@@ -7,13 +7,13 @@ deploy:
   api_key:
     secure: XZScpPNSCSe+il+ZY1gNvhpqLL+1nprDDTCHUKsqfH5GN/3J23/vbFwOBVWwnA641Bp9z9Q+sAZSVlF1jcaOVvnq28QYoCfSC7LLezC8uGlKVwSNAix28DdL5/9tzoiRgJpou/W92FB3F4jQI6oYku7d3XvxVPK0+vio1B1pLtY2uR7hO0CKJ1By+aYXZKY/VeIo1vDAnuPDnoOAMS7hbCfMeAHnb7lEy1pEr2Rih7/avMrL1YfxCAry7vgdIuOWk9sZdmjvt1lR3gW4zXLf4lHWZLtf7uYRAR+JL+mmRamuUr+C3xfDoqP1N9J03iXh/slTFtrVPdw4YvWP5KJtpbWjF3osRtpn58nwwbzU/3HKdP01DJtAbjAlTEDIeywSB8VlXV1qkgoFhB4bjPOgEF6auR30e6fIRYCBqiQwaq1PFj9/EWn4fkTl8yJexvIPKNHwSehnhHmNXcQhWauUPKj7XXdnKqYTUn1MUBIxNn3jwpDSTpnC8j5hhaU9jf+RkGDjKVcLywGJve1rN0FoXBpFtSlKASBN9/2d6AWDGeSpwnJp1JflO+wNiX6PLQJ3H14fKo7BorxEY7N9hUTUeNdgPTd5ulNYfkclNaJ7eNINvgHEVO2Uxkat3Imd9q91kWRXWa/XAhbow+/2e8ShN+uIPURt5p0UUIPmHqUyY9M=
   file:
-  - release/myproject-linux-amd64
-  - release/myproject-linux-386
-  - release/myproject-linux-arm
-  - release/myproject-darwin-amd64
-  - release/myproject-darwin-386
-  - release/myproject-windows-amd64
-  - release/myproject-windows-386
+  - release/learning-api-linux-amd64
+  - release/learning-api-linux-386
+  - release/learning-api-linux-arm
+  - release/learning-api-darwin-amd64
+  - release/learning-api-darwin-386
+  - release/learning-api-windows-amd64.exe
+  - release/learning-api-windows-386.exe
   on:
     repo: jcbwlkr/learning-api
     tags: true
