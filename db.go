@@ -5,86 +5,86 @@ import (
 	"sync"
 )
 
-var errNotFound = errors.New("Post not found")
+var errNotFound = errors.New("Article not found")
 
-// Post is a message by a user
-type Post struct {
-	ID      int    `json:"id"`
-	User    string `json:"user"`
-	Message string `json:"message"`
+// Article is content posted by a user
+type Article struct {
+	ID   int    `json:"id"`
+	User string `json:"user"`
+	Body string `json:"body"`
 }
 
-// DB holds our Posts
+// DB holds our Articles
 type DB struct {
 	sync.RWMutex
-	posts []Post
+	articles []Article
 }
 
-// FindOne finds a post by its ID
-func (db *DB) FindOne(id int) (Post, error) {
+// FindOne finds an article by its ID
+func (db *DB) FindOne(id int) (Article, error) {
 	db.RLock()
 	defer db.RUnlock()
 
-	for _, p := range db.posts {
+	for _, p := range db.articles {
 		if p.ID == id {
 			return p, nil
 		}
 	}
 
-	return Post{}, errNotFound
+	return Article{}, errNotFound
 }
 
-// FindAll returns all Posts
-func (db *DB) FindAll() []Post {
+// FindAll returns all Articles
+func (db *DB) FindAll() []Article {
 	db.RLock()
 	defer db.RUnlock()
 
-	return db.posts
+	return db.articles
 }
 
-// Insert adds a Post to the DB. It sets the ID field and returns the modified
-// Post.
-func (db *DB) Insert(p Post) Post {
+// Insert adds an Article to the DB. It sets the ID field and returns the modified
+// Article.
+func (db *DB) Insert(p Article) Article {
 	db.Lock()
 	defer db.Unlock()
 
 	id := 0
 
-	for _, post := range db.posts {
-		if post.ID > id {
-			id = post.ID
+	for _, article := range db.articles {
+		if article.ID > id {
+			id = article.ID
 		}
 	}
 	id++
 
 	p.ID = id
 
-	db.posts = append(db.posts, p)
+	db.articles = append(db.articles, p)
 
 	return p
 }
 
-// Update finds a Post in the DB by ID and replaces it
-func (db *DB) Update(p Post) {
+// Update finds an Article in the DB by ID and replaces it
+func (db *DB) Update(p Article) {
 	db.Lock()
 	defer db.Unlock()
 
-	for i, post := range db.posts {
-		if post.ID == p.ID {
-			db.posts[i] = p
+	for i, article := range db.articles {
+		if article.ID == p.ID {
+			db.articles[i] = p
 			return
 		}
 	}
 }
 
-// Delete removes a Post from the collection by ID
+// Delete removes an Article from the collection by ID
 func (db *DB) Delete(id int) {
 	db.Lock()
 	defer db.Unlock()
 
-	for i, post := range db.posts {
-		if post.ID == id {
-			db.posts = append(db.posts[:i], db.posts[i+1:]...)
+	for i, article := range db.articles {
+		if article.ID == id {
+			db.articles = append(db.articles[:i], db.articles[i+1:]...)
 			return
 		}
 	}

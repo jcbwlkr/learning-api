@@ -11,57 +11,55 @@ To get around a Cross Origin Request issue that you may encounter in your
 browser you can also use this application to serve files in a directory on
 localhost. Change to the directory of your web application and run the
 executable. Leave it running. This will create an HTTP server that
-you can hit by browsing to `http://localhost:8080/posts/` and you can view your
+you can hit by browsing to `http://localhost:8080/articles/` and you can view your
 site by browsing to `http://localhost:8080/site/`
 
-For this API we are fetching, creating, updating, and deleting a Blog Post
-resource for a simple blog application. A post entity looks like
+For this API we are fetching, creating, updating, and deleting an Article
+resource for a simple news application. A article entity looks like
 
 ```json
 {
   "id": 1,
   "user": "jane",
-  "message": "Hello, world!"
+  "body": "Hello, world!"
 }
 ```
 
 The following routes are available:
 
-## GET /posts
-Fetch all posts from the database.
+## GET /articles
+Fetch all articles from the database.
 
-* Response Body: Array of posts like `[{"id": 1 ...}, {"id": 2 ...}]`
+* Response Body: Array of articles like `[{"id": 1 ...}, {"id": 2 ...}]`
 * Response Status: `200 OK`
 
-## POST /posts
-Create a new post resource. `POST` the HTTP method should not be confused with
-"post" the name of our resource. That is just a coincidence. If our resource
-was named "widget" we would issue a `POST` to `/widgets`.
+## POST /articles
+Create a new article resource.
 
-* Request Body: A post object (without id) like `{"user": "jane", "message": "hello"}`
+* Request Body: A article object (without id) like `{"user": "jane", "body": "hello"}`
 
-* Response Body: The created post `{"id": 3, "user": "jane", "message": "hello"}`
+* Response Body: The created article `{"id": 3, "user": "jane", "body": "hello"}`
 * Response Status: `201 Created` on success, `403 Bad Request` if the request
   body has invalid JSON
 
-## GET /posts/:id
-Fetch a single post from the database. Replace `:id` with the id of the post you want.
+## GET /articles/:id
+Fetch a single article from the database. Replace `:id` with the id of the article you want.
 
-* Response Body: A single post like `{"id": 1, "user": "jane", "message": "Hello, World!"}`
+* Response Body: A single article like `{"id": 1, "user": "jane", "body": "Hello, World!"}`
 * Response Status: `200 OK` on success, `403 Bad Request` if id is not an
-  integer, `404 Not Found` if there is no post for that id.
+  integer, `404 Not Found` if there is no article for that id.
 
-## PUT /posts/:id
-Update a post. Replace `:id` with the id of the post you want to update.
+## PUT /articles/:id
+Update an article. Replace `:id` with the id of the article you want to update.
 
-* Request Body: The updated post, id optional. `{"user": "JANE", "message": "Howdy"}`
+* Request Body: The updated article without id like `{"user": "JANE", "body": "Howdy"}`
 
-* Response Body: The updated post like `{"id": 1, "user": "JANE", "message": "Howdy"}`
+* Response Body: The updated article like `{"id": 1, "user": "JANE", "body": "Howdy"}`
 * Response Status: `200 OK` on success, `403 Bad Request` if id is not an
   integer or if the provided JSON is invalid.
 
-## DELETE /posts/:id
-Delete a post. Replace `:id` with the id of the post you want to delete.
+## DELETE /articles/:id
+Delete an article. Replace `:id` with the id of the article you want to delete.
 
 * Response Body: None.
 * Response Status: `204 No Content` on success, `403 Bad Request` if id is not

@@ -19,8 +19,8 @@ var (
 func init() {
 	flag.IntVar(&port, "port", 8080, "The port to bind to on localhost")
 
-	db.Insert(Post{User: "jane", Message: "Hello, world!"})
-	db.Insert(Post{User: "john", Message: "Lorem ipsum dolor sit amet."})
+	db.Insert(Article{User: "jane", Body: "Hello, world!"})
+	db.Insert(Article{User: "john", Body: "Lorem ipsum dolor sit amet."})
 }
 
 func main() {
@@ -29,26 +29,26 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", index)
-	router.GET("/posts", list)
-	router.POST("/posts", create)
-	router.GET("/posts/:id", fetch)
-	router.PUT("/posts/:id", update)
-	router.DELETE("/posts/:id", del)
+	router.GET("/articles", list)
+	router.POST("/articles", create)
+	router.GET("/articles/:id", fetch)
+	router.PUT("/articles/:id", update)
+	router.DELETE("/articles/:id", del)
 	router.ServeFiles("/site/*filepath", http.Dir(""))
 
 	addr := fmt.Sprintf("localhost:%d", port)
 
-	fmt.Printf("\nBlog posts test API!\n\n")
+	fmt.Printf("\nBlog articles test API!\n\n")
 
 	fmt.Printf("This server is now listening on %s\n", addr)
 	fmt.Printf("If you ran this command from inside your site's folder you can view your site at http://%s/site/\n", addr)
 
 	fmt.Println("You can make the following API requests")
-	fmt.Printf("GET    http://%s/posts      -- Get all posts\n", addr)
-	fmt.Printf("POST   http://%s/posts      -- Make a post. Send a body like {\"user\": \"alice\", \"message\": \"foo\"}\n", addr)
-	fmt.Printf("GET    http://%s/posts/:id  -- Get a particular post\n", addr)
-	fmt.Printf("PUT    http://%s/posts/:id  -- Update a post. Send a body like {\"user\": \"anna\", \"message\": \"bar\"}\n", addr)
-	fmt.Printf("DELETE http://%s/posts/:id  -- Delete a post\n", addr)
+	fmt.Printf("GET    http://%s/articles      -- Get all articles\n", addr)
+	fmt.Printf("POST   http://%s/articles      -- Make an article. Send a body like {\"user\": \"alice\", \"body\": \"foo\"}\n", addr)
+	fmt.Printf("GET    http://%s/articles/:id  -- Get a particular article\n", addr)
+	fmt.Printf("PUT    http://%s/articles/:id  -- Update an article. Send a body like {\"user\": \"anna\", \"body\": \"bar\"}\n", addr)
+	fmt.Printf("DELETE http://%s/articles/:id  -- Delete an article\n", addr)
 
 	fmt.Printf("\nPress Ctrl-c at any time to kill this server\n\n")
 
@@ -81,7 +81,7 @@ func idFromParams(ps httprouter.Params) (int, error) {
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	logRequest(r)
-	fmt.Fprintln(w, "Welcome to the Posts test API!")
+	fmt.Fprintln(w, "Welcome to the Articles test API!")
 }
 
 func list(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -92,15 +92,15 @@ func list(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	logRequest(r)
 
-	post := Post{}
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+	article := Article{}
+	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	post = db.Insert(post)
+	article = db.Insert(article)
 
-	serveJSON(w, post, http.StatusOK)
+	serveJSON(w, article, http.StatusOK)
 }
 
 func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -112,11 +112,11 @@ func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	post, err := db.FindOne(id)
+	article, err := db.FindOne(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 	} else {
-		serveJSON(w, post, http.StatusOK)
+		serveJSON(w, article, http.StatusOK)
 	}
 }
 
@@ -130,18 +130,18 @@ func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	post := Post{}
-	if err := json.NewDecoder(r.Body).Decode(&post); err != nil {
+	article := Article{}
+	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if post.ID == 0 {
-		post.ID = id
+	if article.ID == 0 {
+		article.ID = id
 	}
 
-	db.Update(post)
-	serveJSON(w, post, http.StatusOK)
+	db.Update(article)
+	serveJSON(w, article, http.StatusOK)
 }
 
 func del(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
