@@ -56,7 +56,7 @@ func main() {
 }
 
 func logRequest(r *http.Request) {
-	log.Printf("Serving %s\n", r.URL.Path)
+	log.Printf("Serving %-6s %s\n", r.Method, r.URL.Path)
 }
 
 func serveJSON(w http.ResponseWriter, data interface{}, status int) {
