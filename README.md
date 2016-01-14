@@ -7,12 +7,11 @@ Download one of the pre built binaries from the
 [releases](https://github.com/jcbwlkr/learning-api/releases) page or build from
 source. If you are using a Mac then you want one of the Darwin binaries.
 
-To get around a Cross Origin Request issue that you may encounter in your
-browser you can also use this application to serve files in a directory on
-localhost. Change to the directory of your web application and run the
-executable. Leave it running. This will create an HTTP server that
-you can hit by browsing to `http://localhost:8080/articles/` and you can view your
-site by browsing to `http://localhost:8080/site/`
+For your convenience you can also use this application to serve files in a
+directory on localhost. Change to the directory of your web application and run
+the executable. Leave it running. This will create an HTTP server that you can
+hit by browsing to `http://localhost:8080/articles/` and you can view your site
+by browsing to `http://localhost:8080/site/`
 
 For this API we are fetching, creating, updating, and deleting an Article
 resource for a simple news application. A article entity looks like

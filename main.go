@@ -31,9 +31,11 @@ func main() {
 	router.GET("/", index)
 	router.GET("/articles", list)
 	router.POST("/articles", create)
+	router.OPTIONS("/articles", options)
 	router.GET("/articles/:id", fetch)
 	router.PUT("/articles/:id", update)
 	router.DELETE("/articles/:id", del)
+	router.OPTIONS("/articles/:id", options)
 	router.ServeFiles("/site/*filepath", http.Dir(""))
 
 	addr := fmt.Sprintf("localhost:%d", port)
@@ -52,7 +54,11 @@ func main() {
 
 	fmt.Printf("\nPress Ctrl-c at any time to kill this server\n\n")
 
-	log.Fatal(http.ListenAndServe(addr, mwLogger(router)))
+	var h http.Handler = router
+	h = mwCORSHeaders(h)
+	h = mwLogger(h)
+
+	log.Fatal(http.ListenAndServe(addr, h))
 }
 
 func mwLogger(h http.Handler) http.Handler {
@@ -62,17 +68,22 @@ func mwLogger(h http.Handler) http.Handler {
 	})
 }
 
+func mwCORSHeaders(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		h.ServeHTTP(w, r)
+	})
+}
+
 func serveJSON(w http.ResponseWriter, data interface{}, status int) {
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 
+	w.WriteHeader(status)
 	if err := json.NewEncoder(w).Encode(&data); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
 		s := http.StatusInternalServerError
 		http.Error(w, http.StatusText(s), s)
 		return
 	}
-
-	w.WriteHeader(status)
 }
 
 func idFromParams(ps httprouter.Params) (int, error) {
@@ -88,6 +99,12 @@ func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprintln(w, "Welcome to the Articles test API!")
 }
 
+func options(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	w.Header().Set("Access-Control-Allow-Methods", "PUT, POST, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
+	w.WriteHeader(http.StatusOK)
+}
+
 func list(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	serveJSON(w, db.FindAll(), http.StatusOK)
 }
@@ -101,7 +118,7 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 	article = db.Insert(article)
 
-	serveJSON(w, article, http.StatusOK)
+	serveJSON(w, article, http.StatusCreated)
 }
 
 func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
