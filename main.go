@@ -52,11 +52,14 @@ func main() {
 
 	fmt.Printf("\nPress Ctrl-c at any time to kill this server\n\n")
 
-	log.Fatal(http.ListenAndServe(addr, router))
+	log.Fatal(http.ListenAndServe(addr, mwLogger(router)))
 }
 
-func logRequest(r *http.Request) {
-	log.Printf("Serving %-6s %s\n", r.Method, r.URL.Path)
+func mwLogger(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Serving %-6s %s\n", r.Method, r.URL.Path)
+		h.ServeHTTP(w, r)
+	})
 }
 
 func serveJSON(w http.ResponseWriter, data interface{}, status int) {
@@ -68,6 +71,8 @@ func serveJSON(w http.ResponseWriter, data interface{}, status int) {
 		http.Error(w, http.StatusText(s), s)
 		return
 	}
+
+	w.WriteHeader(status)
 }
 
 func idFromParams(ps httprouter.Params) (int, error) {
@@ -80,18 +85,14 @@ func idFromParams(ps httprouter.Params) (int, error) {
 }
 
 func index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	logRequest(r)
 	fmt.Fprintln(w, "Welcome to the Articles test API!")
 }
 
 func list(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	logRequest(r)
 	serveJSON(w, db.FindAll(), http.StatusOK)
 }
 
 func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	logRequest(r)
-
 	article := Article{}
 	if err := json.NewDecoder(r.Body).Decode(&article); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -104,7 +105,6 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	logRequest(r)
 	var id int
 	var err error
 	if id, err = idFromParams(ps); err != nil {
@@ -121,8 +121,6 @@ func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	logRequest(r)
-
 	var id int
 	var err error
 	if id, err = idFromParams(ps); err != nil {
@@ -146,7 +144,6 @@ func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func del(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	logRequest(r)
 	var id int
 	var err error
 	if id, err = idFromParams(ps); err != nil {
