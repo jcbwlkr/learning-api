@@ -105,15 +105,16 @@ func create(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id int
-	var err error
+	var (
+		id  int
+		err error
+	)
 	if id, err = idFromParams(ps); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	article, err := db.FindOne(id)
-	if err != nil {
+	if article, err := db.FindOne(id); err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 	} else {
 		serveJSON(w, article, http.StatusOK)
@@ -121,8 +122,10 @@ func fetch(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id int
-	var err error
+	var (
+		id  int
+		err error
+	)
 	if id, err = idFromParams(ps); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -144,8 +147,10 @@ func update(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func del(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	var id int
-	var err error
+	var (
+		id  int
+		err error
+	)
 	if id, err = idFromParams(ps); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
